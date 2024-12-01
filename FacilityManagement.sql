@@ -338,3 +338,54 @@ CREATE VIEW `ClassSummaryView` AS
 		c.Capacity,
 		f.Name,
 		f.Location;
+
+
+
+DELIMITER //
+
+CREATE TRIGGER validate_class_capacity
+BEFORE INSERT ON ClassEnrollment
+FOR EACH ROW
+BEGIN
+    DECLARE current_enrollment INT;
+    DECLARE class_capacity INT;
+
+    SELECT COUNT(*) INTO current_enrollment
+    FROM ClassEnrollment
+    WHERE ClassRID = NEW.ClassRID;
+
+    SELECT Capacity INTO class_capacity
+    FROM Class
+    WHERE RID = NEW.ClassRID;
+
+    IF current_enrollment >= class_capacity THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Class capacity exceeded.';
+    END IF;
+END
+
+DELIMITER //
+
+
+
+DELIMITER //
+
+CREATE TRIGGER validate_membership_validity
+BEFORE INSERT ON FacilityUsage
+FOR EACH ROW
+BEGIN
+    DECLARE membership_end_date DATE;
+
+    -- Get the member's membership end date
+    SELECT EndDate INTO membership_end_date
+    FROM Member
+    WHERE RID = NEW.MemberRID;
+
+    -- Check if the membership is expired
+    IF membership_end_date < CURDATE() THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Membership is not valid. Please renew membership.';
+    END IF;
+END$$
+
+DELIMITER //
