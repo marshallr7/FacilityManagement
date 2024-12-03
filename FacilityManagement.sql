@@ -319,25 +319,28 @@ CREATE VIEW `FacilityUsageView` AS
 
 
 CREATE VIEW `ClassSummaryView` AS
-	SELECT
-		c.Name AS ClassName,
-		c.Description,
-		c.Schedule,
-		c.Capacity,
-		f.Name AS FacilityName,
-		f.Location AS FacilityLocation,
-		COUNT(ce.MemberRID) AS EnrolledMembers
-	FROM Class c
-	JOIN Facility f ON c.FacilityRID = f.RID
-	JOIN ClassEnrollment ce ON c.RID = ce.ClassRID
-	GROUP BY 
+    SELECT 
+        c.Name AS ClassName,
+        c.Description,
+        c.Schedule,
+        c.Capacity,
+        f.RID,
+        f.Name AS FacilityName,
+        f.Location AS FacilityLocation,
+        COUNT(ce.MemberRID) AS EnrolledMembers
+    FROM Class c
+    JOIN Facility f ON c.FacilityRID = f.RID
+    LEFT JOIN ClassEnrollment ce ON c.RID = ce.ClassRID
+    GROUP BY
 		c.RID,
 		c.Name,
 		c.Description,
-		c.Schedule,
+		c.Schedule, 
 		c.Capacity,
+		f.RID,
 		f.Name,
 		f.Location;
+
 
 
 
