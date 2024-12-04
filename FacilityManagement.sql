@@ -117,6 +117,27 @@ CREATE TABLE Equipment (
     INDEX idx_equipment_facility (FacilityRID)
 );
 
+-- FacilityUsage Table
+CREATE INDEX idx_facilityusage_facility_checkin ON FacilityUsage (FacilityRID, CheckIn);
+CREATE INDEX idx_facilityusage_member_checkin ON FacilityUsage (MemberRID, CheckIn);
+
+-- Member Table
+CREATE INDEX idx_member_email ON Member (Email);
+
+-- Employee Table
+CREATE INDEX idx_employee_facility_position ON Employee (FacilityRID, Position);
+CREATE INDEX idx_employee_supervisor ON Employee (SupervisorRID);
+
+-- Class Table
+CREATE INDEX idx_class_facility_schedule ON Class (FacilityRID, Schedule);
+
+-- ClassEnrollment Table
+CREATE INDEX idx_classenrollment_class_member ON ClassEnrollment (ClassRID, MemberRID);
+CREATE INDEX idx_classenrollment_enrollmentdate ON ClassEnrollment (EnrollmentDate);
+
+-- Equipment Table
+CREATE INDEX idx_equipment_facility_maintenance ON Equipment (FacilityRID, MaintenanceDate);
+
 
 -- Test data
 -- Test Data for Facility
