@@ -294,6 +294,58 @@ INNER JOIN MembershipType ON Member.MembershipTypeRID = MembershipType.RID
 GROUP BY MembershipType.Name;
 
 
+-- 10. Query all active members in the facility, constrained by the member's end date
+-- CREATE VIEW `ActiveMembersView` AS
+	SELECT
+		m.RID AS MemberRID,
+		m.FirstName,
+		m.LastName,
+		m.Email,
+		mt.RID AS MembershipTypeRID,
+		mt.Name AS MembershipType,
+		mt.MonthlyFee,
+		f.RID AS LastFactilityUsedRID,
+		f.Name AS LastFacilityUsed,
+		m.JoinDate
+	FROM Member m
+	JOIN MembershipType mt ON m.MembershipTypeRID = mt.RID
+	JOIN FacilityUsage fusage ON m.RID = fusage.MemberRID
+	JOIN Facility f ON fusage.FacilityRID = f.RID
+	WHERE m.EndDate IS NULL OR m.EndDate > CURDATE();
+		
+SELECT * FROM `ActiveMembersView`;
+	
+-- 11. Query this view to summarize all classes in the facility management system.
+-- CREATE VIEW `ClassSummaryView` AS
+    SELECT 
+        c.Name AS ClassName,
+        c.Description,
+        c.Schedule,
+        c.Capacity,
+        f.RID,
+        f.Name AS FacilityName,
+        f.Location AS FacilityLocation,
+        COUNT(ce.MemberRID) AS EnrolledMembers
+    FROM Class c
+    JOIN Facility f ON c.FacilityRID = f.RID
+    LEFT JOIN ClassEnrollment ce ON c.RID = ce.ClassRID
+    GROUP BY
+		c.RID,
+		c.Name,
+		c.Description,
+		c.Schedule, 
+		c.Capacity,
+		f.RID,
+		f.Name,
+		f.Location;
+
+SELECT * FROM `ClassSummaryView`;
+
+
+
+
+
+
 CREATE VIEW `ActiveMembersView` AS
 	SELECT
 		m.RID AS MemberRID,
